@@ -1,4 +1,5 @@
 import java.util.*
+import kotlin.collections.ArrayList
 
 fun main(vararg args: String) {
     /*
@@ -50,7 +51,6 @@ fun main(vararg args: String) {
     } else
         println("Error: few arguments")
     */
-    //println("Program arguments: ${args.joinToString()}")
 
     /*
     //-------------------------------------------------
@@ -70,27 +70,114 @@ fun main(vararg args: String) {
     add Tom email tom@example.com
     add Tom phone +7876743558
     */
-    // "456789".matches(Regex("""[0-9]+""")) // true
-    fun printHelp() {
-        println("СПРАВКА:\nadd <Имя> phone <Номер телефона>\nadd <Имя> email <Адрес электронной почты>/n")
-        println("exit - выход из программы")
-        println("help - вывод этой справки")
-        println("Пример команд:\nadd Tom email tom@example.com\nadd Tom phone +7876743558")
+    fun showHelp() {
+        println(
+            """СПРАВКА:
+    add <Имя> phone <Номер телефона>
+    add <Имя> email <Адрес электронной почты>
+    show - вывод всего списка контактов
+    show <Имя> - вывод контакта по имени
+    exit - выход из программы
+    help или ? - вывод этой справки
+ПРИМЕР КОМАНД:
+    add Tom email tom@example.com
+    add Tom phone +7876743558"""
+        )
+    }
+
+    data class People(val name: String, var tel: String = "", var email: String = "") {
+
+    }
+    //создаём список контактов
+    val listOfPeoples: ArrayList<People> = ArrayList()
+    listOfPeoples.add(People("Alice", "123456", "alice@mail.com"))
+    listOfPeoples.add(People("Bob", "654321", "bob@mail.com"))
+    listOfPeoples.add(People("Tom", "", "tom@example.com"))
+
+    fun showPeople(name: String, list: ArrayList<People>) {
+        if (list.size == 0)
+            println("СПРАВОЧНИК ПУСТ!")
+        else {
+            var count: Int = 0
+            for (i in list)
+                if (i.name.lowercase() == name.lowercase() || name == "") {
+                    count++
+                    println("$count: ${i.name} (phone: ${i.tel}, e-mail: ${i.email})")
+                }
+        }
+    }
+
+    fun findPeople(name: String, list: ArrayList<People>): Int {
+        for (i in 0 until list.size)
+            if (list[i].name.lowercase() == name.lowercase()) return i
+        return -1
+    }
+
+    fun addPeople(name: String, field: Int, data: String, list: ArrayList<People>) {
+        val findIndex: Int = findPeople(name, list)
+        if (findIndex < 0) {
+            when (field) {
+                1 -> list.add(People(name, tel = data))
+                2 -> list.add(People(name, email = data))
+            }
+        } else when (field) {
+            1 -> list[findIndex].tel = data
+            2 -> list[findIndex].email = data
+        }
+        showPeople("", list)
     }
 
     var toExit: Boolean = false
+    println("Программа \"Справочник\"")
     while (!toExit) {
         print("Введите команду: ")
         val input = readlnOrNull()
-        //println(input)
-        if (input != "")
-            when {
-                input?.lowercase(Locale.getDefault()) == "exit" -> toExit = true
-                input?.lowercase(Locale.getDefault()) == "help" -> printHelp()
-                else -> {
-                    println("НЕИЗВЕСТНАЯ КОМАНДА!")
-                    printHelp()
+        if (input != "" && input != null) {
+            val inputText = input.trim()
+            val parts = inputText.split(' ')
+            var name: String = ""
+            var data: String = ""
+            var field: Int = 0
+            if (parts.size == 2) name = parts[1]
+            when (parts[0].lowercase()) {
+                "exit" -> toExit = true
+                "help" -> showHelp()
+                "?" -> showHelp()
+                "add" -> {
+                    if (parts.size == 4) {
+                        name = parts[1]
+                        data = parts[3].lowercase()
+                        when (parts[2].lowercase()) {
+                            "phone" -> {
+                                if (data.matches(Regex("""[0-9]+""")))
+                                    field = 1
+                                else {
+                                    println("УКАЗАН НЕВЕРНЫЙ phone!")
+                                    continue
+                                }
+                            }
+
+                            "email" -> {
+                                if (data.split('@').size != 2) {
+                                    println("УКАЗАН НЕВЕРНЫЙ email!")
+                                    continue
+                                }
+                                field = 2
+                            }
+
+                            else -> {
+                                println("НЕИЗВЕСТНЫЙ ПАРАМЕТР '${parts[2]}' КОМАНДЫ 'add'! (для справки введите ? или help)")
+                                continue
+                            }
+                        }
+                        addPeople(name, field, data, listOfPeoples)
+                    }
                 }
+
+                "show" -> showPeople(name, listOfPeoples)
+                else -> println("НЕИЗВЕСТНАЯ КОМАНДА '${parts[0]}'! (для справки введите ? или help)")
             }
+        }
     }
+    println("Завершение программы \"Справочник\"")
 }
