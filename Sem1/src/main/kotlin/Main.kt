@@ -158,7 +158,7 @@ fun main(vararg args: String) {
                             }
 
                             "email" -> {
-                                if (data.split('@').size != 2) {
+                                if (!data.matches(Regex("""\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,6}"""))) {
                                     println("УКАЗАН НЕВЕРНЫЙ email!")
                                     continue
                                 }
