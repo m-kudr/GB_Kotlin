@@ -1,3 +1,17 @@
+sealed interface Command {
+    class Help() : Com mand {
+
+    }
+
+    class Add(val data: String) {
+
+    }
+
+    class Show() {
+
+    }
+}
+
 fun main(args: Array<String>) {
     /*
 За основу берём код решения домашнего задания из предыдущего семинара и дорабатываем его.
@@ -25,6 +39,7 @@ email – адрес электронной почты
     */
 
     println("Программа \"Справочник\"")
+
 
     fun showHelp() {
         println(
