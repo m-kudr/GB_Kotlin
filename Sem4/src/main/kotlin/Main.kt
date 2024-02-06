@@ -197,7 +197,11 @@ fun main(args: Array<String>) {
             if (parts.size > 1)
                 param = parts[1]
             when (parts[0].lowercase()) {
-                "export" -> export(param, listOfPeoples)
+                "export" -> if (param != "") export(
+                    param,
+                    listOfPeoples
+                ) else println("В КОМАНДЕ НЕ УКАЗАНО ИМЯ ФАЙЛА ДЛЯ ЭКСПОРТА")
+
                 "show" -> showPeople(param, listOfPeoples)
                 "exit" -> toExit = true
                 "help", "h", "?" -> showHelp()
